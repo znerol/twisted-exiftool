@@ -1,0 +1,14 @@
+*.pyc
+
+# Twisted
+/twistd.log
+/twisted/plugins/dropin.cache
+
+# Buildout paths
+/*.egg-info
+/.installed.cfg
+/bin
+/develop-eggs
+/downloads
+/eggs
+/parts
