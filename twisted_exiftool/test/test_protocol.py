@@ -29,11 +29,12 @@ class ExiftoolProtocolTest(TestCase):
         expected = "\n".join([
             "ExifTool Version Number         : 9.74",
             "File Name                       : file.jpg",
-            "Directory                       : /path/to"
+            "Directory                       : /path/to",
+            ""
         ])
 
         d.addCallback(self.assertEqual, expected)
-        self.proto.dataReceived("%s\n{ready%d}\n" % (expected, self.tag))
+        self.proto.dataReceived("%s{ready%d}\n" % (expected, self.tag))
 
         return d
 
@@ -45,7 +46,8 @@ class ExiftoolProtocolTest(TestCase):
         expected_result_1 = "\n".join([
             "ExifTool Version Number         : 9.74",
             "File Name                       : file.jpg",
-            "Directory                       : /path/to"
+            "Directory                       : /path/to",
+            ""
         ])
         d1.addCallback(self.assertEqual, expected_result_1)
 
@@ -61,14 +63,52 @@ class ExiftoolProtocolTest(TestCase):
             "  | ColorType = 2",
             "  | Compression = 0",
             "  | Filter = 0",
-            "  | Interlace = 0"
+            "  | Interlace = 0",
+            ""
         ])
         d2.addCallback(self.assertEqual, expected_result_2)
 
         self.assertEqual(self.tr.value(), expected_command_1 + expected_command_2)
         self.tr.clear()
 
-        self.proto.dataReceived("%s\n{ready%d}\n" % (expected_result_1, self.tag - 1))
-        self.proto.dataReceived("%s\n{ready%d}\n" % (expected_result_2, self.tag))
+        self.proto.dataReceived("%s{ready%d}\n" % (expected_result_1, self.tag - 1))
+        self.proto.dataReceived("%s{ready%d}\n" % (expected_result_2, self.tag))
 
         return defer.DeferredList([d1, d2])
+
+
+    def test_empty_response(self):
+        self.tag += 1
+
+        d = self.proto.execute('/path/to/file.jpg')
+        self.assertEqual(self.tr.value(), '/path/to/file.jpg\n-execute%d\n' % (self.tag,))
+        self.tr.clear()
+
+        d.addCallback(self.assertEqual, '')
+        self.proto.dataReceived("{ready%d}\n" % self.tag)
+
+        return d
+
+
+    def test_chunked_resonse(self):
+        self.tag += 1
+
+        d = self.proto.execute('/path/to/file.jpg')
+        self.assertEqual(self.tr.value(), '/path/to/file.jpg\n-execute%d\n' % (self.tag,))
+        self.tr.clear()
+
+        expected = "\n".join([
+            "ExifTool Version Number         : 9.74",
+            "File Name                       : file.jpg",
+            "Directory                       : /path/to",
+            ""
+        ])
+
+        d.addCallback(self.assertEqual, expected)
+
+        response = "%s{ready%d}\n" % (expected, self.tag)
+        s = 16
+        for i in xrange(0, len(response), s):
+            self.proto.dataReceived(response[i:i+s])
+
+        return d

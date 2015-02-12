@@ -1,7 +1,7 @@
 import codecs
+import re
 import sys
-from twisted.internet import defer, error
-from twisted.protocols import basic
+from twisted.internet import defer, error, protocol
 from twisted.python import log
 
 # This code has been adapted from Lib/os.py in the Python source tree (sha1
@@ -35,39 +35,57 @@ def _fscodec():
 fsencode = _fscodec()
 del _fscodec
 
-class ExiftoolProtocol(basic.LineOnlyReceiver):
+class ExiftoolProtocol(protocol.Protocol):
 
-    delimiter = b'\n'
-    MAX_LENGTH = 65536
+    MAX_LENGTH = 2**16
+    _buffer = b''
+    _pattern = re.compile(r'^{ready([0-9]+)}$', re.MULTILINE)
 
     def __init__(self, default_args = ()):
         self.default_args = tuple(default_args)
-        self._lines = []
         self._queue = {}
         self._stopped = None
         self._tag = 0
 
 
-    def connectionMade(self):
-        # Work around http://twistedmatrix.com/trac/ticket/6606
-        try:
-            test = self.transport.disconnecting
-        except AttributeError:
-            self.transport.disconnecting = False
+    def dataReceived(self, data):
+        """
+        Parses chunks of bytes into responses.
+        """
+        l = len(self._buffer) + len(data)
+        if (l > self.MAX_LENGTH):
+            self.lengthLimitExceeded(l)
+        self._buffer += data
 
+        start = 0
+        for match in self._pattern.finditer(self._buffer):
+            # The start of the sentinel marks the end of the response.
+            end = match.start()
+            tag = int(match.group(1))
+            self.responseReceived(self._buffer[start:end], tag)
 
-    def lineReceived(self, line):
-        if (line.startswith('{ready')):
-            tag = int(line[6:-1])
-            self.responseReceived(self.delimiter.join(self._lines), tag)
-            self._lines = []
-        else:
-            self._lines.append(line)
+            # Advance start position to the beginning of the next line
+            start = match.end() + 2
+
+        if start:
+            self._buffer = self._buffer[start:]
 
 
     def responseReceived(self, data, tag):
         d = self._queue.pop(tag)
         d.callback(data)
+
+
+    def lengthLimitExceeded(self, line):
+        """
+        Callback invoked when the incomming data would exceed the length limit
+        appended to the buffer. The default implementation disconnects the
+        transport.
+
+        @param length: The number of bytes
+        @type length: C{int}
+        """
+        return error.ConnectionLost('Length limit exceeded')
 
 
     def execute(self, *args):
