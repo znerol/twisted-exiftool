@@ -4,14 +4,14 @@ from twisted.trial import unittest
 
 class ClientStringTests(unittest.TestCase):
     """
-    Tests for L{twisted.plugins.twisted_exiftool_process_endpoint.ExiftoolProcessEndpoint}.
+    Tests for L{twisted.plugins.twisted_exiftool.ExiftoolProcessEndpoint}.
     """
 
     def test_endpoint_with_executable_path(self):
         """
-        When passed an exiftool strports description,
-        L{endpoints.clientFromString} returns a L{ProcessEndpoint} instance
-        initialized with the exiftool executable specified in the string.
+        When passed a strports description, L{endpoints.clientFromString}
+        returns a L{ProcessEndpoint} instance initialized with the exiftool
+        executable specified in the string.
         """
         ep = endpoints.clientFromString(reactor, b"exiftool:/some/path/to/exiftool")
         self.assertIsInstance(ep, endpoints.ProcessEndpoint)

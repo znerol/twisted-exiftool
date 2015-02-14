@@ -40,4 +40,4 @@ class ExiftoolProcessEndpoint(object):
         return self._parse(reactor, *args, **kwargs)
 
 
-exiftool = ExiftoolProcessEndpoint()
+processEndpoint = ExiftoolProcessEndpoint()

@@ -9,7 +9,7 @@ setup(
     packages=['twisted_exiftool'],
     package_data={
         'twisted.plugins': [
-            'twisted/plugins/twisted_exiftool_process_endpoint.py',
+            'twisted/plugins/twisted_exiftool.py',
         ]
     },
     install_requires=[
