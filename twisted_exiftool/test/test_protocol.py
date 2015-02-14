@@ -2,7 +2,8 @@
 Tests for L{twisted_exiftool.ExiftoolProtocol}
 """
 
-from twisted.internet import defer, protocol
+from twisted.internet import defer, error, protocol
+from twisted.python import failure
 from twisted.test import proto_helpers
 from twisted.trial.unittest import TestCase
 from twisted_exiftool import ExiftoolProtocol
@@ -14,7 +15,8 @@ class ExiftoolProtocolTest(TestCase):
     def setUp(self):
         factory = protocol.Factory.forProtocol(ExiftoolProtocol)
         self.proto = factory.buildProtocol(None)
-        self.tr = proto_helpers.StringTransport()
+        self.tr = proto_helpers.StringTransportWithDisconnection()
+        self.tr.protocol = self.proto
         self.proto.makeConnection(self.tr)
         self.tag = 0
 
@@ -90,7 +92,7 @@ class ExiftoolProtocolTest(TestCase):
         return d
 
 
-    def test_chunked_resonse(self):
+    def test_chunked_response(self):
         self.tag += 1
 
         d = self.proto.execute('/path/to/file.jpg')
@@ -112,3 +114,26 @@ class ExiftoolProtocolTest(TestCase):
             self.proto.dataReceived(response[i:i+s])
 
         return d
+
+    def test_disconnect(self):
+        self.assertEqual(self.proto.connected, True)
+
+        # Call loseConnection on protocol
+        d = self.proto.loseConnection()
+
+        self.assertEqual(self.tr.value(), '-stay_open\nFalse\n')
+        self.assertEqual(self.proto.connected, False)
+        self.tr.clear()
+
+        d.addCallback(self.assertEqual, self.proto)
+
+        return d
+
+    def test_connection_lost(self):
+        self.assertEqual(self.proto.connected, True)
+
+        self.failUnlessRaises(error.ConnectionLost, self.proto.connectionLost, failure.Failure(error.ConnectionLost('process exited')))
+
+        self.assertEqual(self.tr.value(), '')
+        self.assertEqual(self.proto.connected, False)
+        self.tr.clear()

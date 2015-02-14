@@ -100,12 +100,17 @@ class ExiftoolProtocol(protocol.Protocol):
 
 
     def loseConnection(self):
-        if self.connected and not self._stopped:
-            self._stopped = defer.Deferred()
+        if self._stopped:
+            d = self._stopped
+        elif self.connected:
+            d = defer.Deferred()
+            self._stopped = d
             self.transport.write("\n".join(('-stay_open', 'False', '')))
             self.transport.loseConnection()
+        else:
+            d = defer.fail(RuntimeError("not connected"))
 
-        return self._stopped
+        return d
 
 
     def connectionLost(self, reason):
