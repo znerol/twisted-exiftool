@@ -75,16 +75,16 @@ class ExiftoolProtocol(protocol.Protocol):
         d.callback(data)
 
 
-    def lengthLimitExceeded(self, line):
+    def lengthLimitExceeded(self, length):
         """
         Callback invoked when the incomming data would exceed the length limit
         appended to the buffer. The default implementation disconnects the
         transport.
 
-        @param length: The number of bytes
+        @param length: The total number of bytes
         @type length: C{int}
         """
-        return error.ConnectionLost('Length limit exceeded')
+        self.transport.loseConnection()
 
 
     def execute(self, *args):
