@@ -9,7 +9,7 @@ from zope.interface import implementer
 @implementer(IPlugin, IStreamClientEndpointStringParserWithReactor)
 class ExiftoolProcessEndpoint(object):
     prefix = 'exiftool'
-    _which = procutils.which
+    _which = staticmethod(procutils.which)
 
     def _find_executable(self):
         binary_name = 'exiftool'
