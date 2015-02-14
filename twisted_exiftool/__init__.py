@@ -2,7 +2,6 @@ import codecs
 import re
 import sys
 from twisted.internet import defer, error, protocol
-from twisted.python import log
 
 # This code has been adapted from Lib/os.py in the Python source tree (sha1
 # 265e36e277f3). The fragment was copied from pyexiftool by Sven Marnach
@@ -115,4 +114,4 @@ class ExiftoolProtocol(protocol.Protocol):
             self._stopped.callback(self if reason.check(error.ConnectionDone) else reason)
             self._stopped = None
         else:
-            log.err(reason)
+            reason.raiseException()
