@@ -65,7 +65,7 @@ class ExiftoolProtocol(protocol.Protocol):
             self.responseReceived(self._buffer[start:end], tag)
 
             # Advance start position to the beginning of the next line
-            start = match.end() + 2
+            start = match.end() + 1
 
         if start:
             self._buffer = self._buffer[start:]
