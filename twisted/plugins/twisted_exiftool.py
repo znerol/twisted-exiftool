@@ -2,17 +2,18 @@ import os
 from twisted.internet.endpoints import ProcessEndpoint
 from twisted.internet.interfaces import IStreamClientEndpointStringParserWithReactor
 from twisted.plugin import IPlugin
-from twisted.python.procutils import which
+from twisted.python import procutils
 from zope.interface import implementer
 
 
 @implementer(IPlugin, IStreamClientEndpointStringParserWithReactor)
 class ExiftoolProcessEndpoint(object):
     prefix = 'exiftool'
+    _which = procutils.which
 
     def _find_executable(self):
         binary_name = 'exiftool'
-        executables = which(binary_name)
+        executables = self._which(binary_name)
         if (len(executables)):
             executable = executables[0]
         else:

@@ -7,11 +7,35 @@ class ClientStringTests(unittest.TestCase):
     Tests for L{twisted.plugins.twisted_exiftool.ExiftoolProcessEndpoint}.
     """
 
-    def test_endpoint_with_executable_path(self):
+    def setUp(self):
+        from twisted.plugins.twisted_exiftool import ExiftoolProcessEndpoint
+        ExiftoolProcessEndpoint._which = self.which_stub
+
+
+    def test_endpoint_with_system_provided_executable(self):
         """
         When passed a strports description, L{endpoints.clientFromString}
         returns a L{ProcessEndpoint} instance initialized with the exiftool
-        executable specified in the string.
+        executable installed in the system.
+        """
+        ep = endpoints.clientFromString(reactor, b"exiftool")
+        self.assertIsInstance(ep, endpoints.ProcessEndpoint)
+        self.assertEqual(ep._executable, '/system/path/to/exiftool')
+        self.assertEqual(ep._args, ('/system/path/to/exiftool', '-stay_open', 'True', '-@', '-'))
+        self.assertEqual(ep._env, {})
+        self.assertEqual(ep._path, None)
+        self.assertEqual(ep._uid, None)
+        self.assertEqual(ep._gid, None)
+        self.assertEqual(ep._usePTY, 0)
+        self.assertEqual(ep._childFDs, None)
+        self.assertEqual(ep._errFlag, StandardErrorBehavior.LOG)
+
+
+    def test_endpoint_with_executable_path(self):
+        """
+        When passed a strports description containing the path to the exiftool
+        executable, L{endpoints.clientFromString} returns a L{ProcessEndpoint}
+        instance initialized with the specified executable.
         """
         ep = endpoints.clientFromString(reactor, b"exiftool:/some/path/to/exiftool")
         self.assertIsInstance(ep, endpoints.ProcessEndpoint)
@@ -24,3 +48,7 @@ class ClientStringTests(unittest.TestCase):
         self.assertEqual(ep._usePTY, 0)
         self.assertEqual(ep._childFDs, None)
         self.assertEqual(ep._errFlag, StandardErrorBehavior.LOG)
+
+
+    def which_stub(self, name):
+        return ['/system/path/to/exiftool']
