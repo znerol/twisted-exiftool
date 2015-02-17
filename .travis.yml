@@ -2,7 +2,6 @@ language: python
 python:
   - 2.7
 install:
-  - pip uninstall setuptools -y
   - python bootstrap.py
   - bin/buildout
 script:
