@@ -36,7 +36,7 @@ del _fscodec
 
 class ExiftoolProtocol(protocol.Protocol):
 
-    MAX_LENGTH = 2**16
+    MAX_LENGTH = 2**32
     _buffer = b''
     _pattern = re.compile(r'^{ready([0-9]+)}$', re.MULTILINE)
 
