@@ -1,3 +1,7 @@
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import unicode_literals
+
 import codecs
 import re
 import sys
@@ -90,8 +94,8 @@ class ExiftoolProtocol(protocol.Protocol):
     def execute(self, *args):
         self._tag += 1
 
-        safe_args = map(fsencode, self.default_args + tuple(args) + ('-execute' + str(self._tag), ''))
-        self.transport.write("\n".join(safe_args))
+        safe_args = map(fsencode, self.default_args + tuple(args) + (b'-execute' + str(self._tag), b''))
+        self.transport.write(b"\n".join(safe_args))
 
         d = defer.Deferred()
         self._queue[self._tag] = d
@@ -105,7 +109,7 @@ class ExiftoolProtocol(protocol.Protocol):
         elif self.connected:
             d = defer.Deferred()
             self._stopped = d
-            self.transport.write("\n".join(('-stay_open', 'False', '')))
+            self.transport.write(b"\n".join((b'-stay_open', b'False', b'')))
             self.transport.loseConnection()
         else:
             d = defer.fail(RuntimeError("not connected"))
