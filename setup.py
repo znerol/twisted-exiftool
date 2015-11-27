@@ -2,12 +2,12 @@ from setuptools import setup
 
 setup(
     name='TwistedExiftool',
-    version='0.1.0',
+    version='0.1.1',
     description='Exiftool protocol and stream endpoint plugin to be used with twisted',
     author='Lorenz Schori',
     author_email='lo@znerol.ch',
     url='https://github.com/znerol/twisted-exiftool',
-    packages=['twisted_exiftool'],
+    packages=['twisted_exiftool', 'twisted.plugins'],
     package_data={
         'twisted.plugins': [
             'twisted/plugins/twisted_exiftool.py',
