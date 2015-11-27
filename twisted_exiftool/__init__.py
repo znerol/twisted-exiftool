@@ -40,16 +40,21 @@ del _fscodec
 
 class ExiftoolProtocol(protocol.Protocol):
 
-    MAX_LENGTH = 2**32
-    _buffer = b''
+    MAX_LENGTH = 2**16
+    _buffer = None
     _pattern = re.compile(b'^{ready([0-9]+)}$', re.MULTILINE)
+    _queue = None
+    _stopped = None
+    _tag = None
 
-    def __init__(self, default_args = ()):
-        self.default_args = tuple(default_args)
+    def connectionMade(self):
+        """
+        Initializes the protocol.
+        """
+        self._buffer = b''
         self._queue = {}
         self._stopped = None
         self._tag = 0
-
 
     def dataReceived(self, data):
         """
@@ -94,7 +99,8 @@ class ExiftoolProtocol(protocol.Protocol):
     def execute(self, *args):
         self._tag += 1
 
-        safe_args = map(fsencode, self.default_args + tuple(args) + ('-execute{:d}'.format(self._tag).encode('utf-8'), b''))
+        args = tuple(args) + ('-execute{:d}'.format(self._tag), '')
+        safe_args = [fsencode(arg) for arg in args]
         self.transport.write(b'\n'.join(safe_args))
 
         d = defer.Deferred()
