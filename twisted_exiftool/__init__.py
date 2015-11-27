@@ -49,9 +49,9 @@ class ExiftoolProtocol(protocol.Protocol):
         @param data: A chunk of data representing a (possibly partial) response
         @type data: C{bytes}
         """
-        l = len(self._buffer) + len(data)
-        if (l > self.MAX_LENGTH):
-            self.lengthLimitExceeded(l)
+        size = len(self._buffer) + len(data)
+        if size > self.MAX_LENGTH:
+            self.lengthLimitExceeded(size)
         self._buffer += data
 
         start = 0
@@ -110,10 +110,10 @@ class ExiftoolProtocol(protocol.Protocol):
         safe_args = [fsencode(arg) for arg in args]
         self.transport.write(b'\n'.join(safe_args))
 
-        d = defer.Deferred()
-        self._queue[self._tag] = d
+        result = defer.Deferred()
+        self._queue[self._tag] = result
 
-        return d
+        return result
 
 
     def loseConnection(self):
@@ -125,16 +125,16 @@ class ExiftoolProtocol(protocol.Protocol):
         was closed.
         """
         if self._stopped:
-            d = self._stopped
+            result = self._stopped
         elif self.connected:
-            d = defer.Deferred()
-            self._stopped = d
+            result = defer.Deferred()
+            self._stopped = result
             self.transport.write(b'\n'.join((b'-stay_open', b'False', b'')))
         else:
             # Already disconnected.
-            d = defer.success(self)
+            result = defer.success(self)
 
-        return d
+        return result
 
     def connectionLost(self, reason=protocol.connectionDone):
         """
@@ -146,7 +146,8 @@ class ExiftoolProtocol(protocol.Protocol):
         """
         self.connected = 0
         if self._stopped:
-            self._stopped.callback(self if reason.check(error.ConnectionDone) else reason)
+            result = self if reason.check(error.ConnectionDone) else reason
+            self._stopped.callback(result)
             self._stopped = None
         else:
             reason.raiseException()
