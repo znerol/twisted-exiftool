@@ -111,7 +111,8 @@ class ExiftoolProtocol(protocol.Protocol):
             self._stopped = d
             self.transport.write(b'\n'.join((b'-stay_open', b'False', b'')))
         else:
-            d = defer.fail(RuntimeError("not connected"))
+            # Already disconnected.
+            d = defer.success(self)
 
         return d
 
