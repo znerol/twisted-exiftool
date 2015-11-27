@@ -1,6 +1,10 @@
 Twisted Exiftool
 ================
 
+.. image:: https://travis-ci.org/znerol/twisted-exiftool.svg?branch=master
+    :target: https://travis-ci.org/znerol/twisted-exiftool
+
+
 Exiftool_ protocol and stream endpoint plugin to be used with twisted_.
 
 .. _Exiftool: http://www.sno.phy.queensu.ca/~phil/exiftool/
