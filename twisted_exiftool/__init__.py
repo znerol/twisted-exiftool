@@ -132,7 +132,7 @@ class ExiftoolProtocol(protocol.Protocol):
             self.transport.write(b'\n'.join((b'-stay_open', b'False', b'')))
         else:
             # Already disconnected.
-            result = defer.success(self)
+            result = defer.succeed(self)
 
         return result
 
