@@ -110,7 +110,6 @@ class ExiftoolProtocol(protocol.Protocol):
             d = defer.Deferred()
             self._stopped = d
             self.transport.write(b"\n".join((b'-stay_open', b'False', b'')))
-            self.transport.loseConnection()
         else:
             d = defer.fail(RuntimeError("not connected"))
 

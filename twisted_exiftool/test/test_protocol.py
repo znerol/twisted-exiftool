@@ -125,6 +125,9 @@ class ExiftoolProtocolTest(TestCase):
         d = self.proto.loseConnection()
 
         self.assertEqual(self.tr.value(), b'-stay_open\nFalse\n')
+
+        # Simulate graceful termination of process.
+        self.proto.connectionLost(failure.Failure(error.ConnectionDone()))
         self.assertEqual(self.proto.connected, False)
         self.tr.clear()
 
