@@ -42,7 +42,7 @@ class ExiftoolProtocol(protocol.Protocol):
 
     MAX_LENGTH = 2**32
     _buffer = b''
-    _pattern = re.compile(r'^{ready([0-9]+)}$', re.MULTILINE)
+    _pattern = re.compile(b'^{ready([0-9]+)}$', re.MULTILINE)
 
     def __init__(self, default_args = ()):
         self.default_args = tuple(default_args)
@@ -94,7 +94,7 @@ class ExiftoolProtocol(protocol.Protocol):
     def execute(self, *args):
         self._tag += 1
 
-        safe_args = map(fsencode, self.default_args + tuple(args) + (b'-execute' + str(self._tag), b''))
+        safe_args = map(fsencode, self.default_args + tuple(args) + ('-execute{:d}'.format(self._tag).encode('utf-8'), b''))
         self.transport.write(b"\n".join(safe_args))
 
         d = defer.Deferred()

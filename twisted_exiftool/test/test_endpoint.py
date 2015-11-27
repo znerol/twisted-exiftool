@@ -22,7 +22,7 @@ class ClientStringTests(unittest.TestCase):
         returns a L{ProcessEndpoint} instance initialized with the exiftool
         executable installed in the system.
         """
-        ep = endpoints.clientFromString(reactor, b"exiftool")
+        ep = endpoints.clientFromString(reactor, u'exiftool')
         self.assertIsInstance(ep, endpoints.ProcessEndpoint)
         self.assertEqual(ep._executable, '/system/path/to/exiftool')
         self.assertEqual(ep._args, ('/system/path/to/exiftool', '-stay_open', 'True', '-@', '-'))
@@ -41,7 +41,7 @@ class ClientStringTests(unittest.TestCase):
         executable, L{endpoints.clientFromString} returns a L{ProcessEndpoint}
         instance initialized with the specified executable.
         """
-        ep = endpoints.clientFromString(reactor, b"exiftool:/some/path/to/exiftool")
+        ep = endpoints.clientFromString(reactor, u'exiftool:/some/path/to/exiftool')
         self.assertIsInstance(ep, endpoints.ProcessEndpoint)
         self.assertEqual(ep._executable, '/some/path/to/exiftool')
         self.assertEqual(ep._args, ('/some/path/to/exiftool', '-stay_open', 'True', '-@', '-'))
