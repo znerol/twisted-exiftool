@@ -19,7 +19,7 @@ Usage
     def test():
         # Construct an exiftool endpoint. If the tool is installed in a custom
         # location, specify the path to the binary as the first argument. E.g.
-        # "exiftool:/path/to/exiftool"
+        # 'exiftool:/path/to/exiftool'
         ep = endpoints.clientFromString(reactor, 'exiftool')
 
         # Instantiate the protocol by connecting to the endpoint

@@ -31,15 +31,15 @@ class ExiftoolProtocolTest(TestCase):
         self.assertEqual(self.tr.value(), '/path/to/file.jpg\n-execute{:d}\n'.format(self.tag).encode('utf-8'))
         self.tr.clear()
 
-        expected = "\n".join([
-            "ExifTool Version Number         : 9.74",
-            "File Name                       : file.jpg",
-            "Directory                       : /path/to",
-            ""
+        expected = '\n'.join([
+            'ExifTool Version Number         : 9.74',
+            'File Name                       : file.jpg',
+            'Directory                       : /path/to',
+            ''
         ])
 
         d.addCallback(self.assertEqual, expected.encode('utf-8'))
-        self.proto.dataReceived("{:s}{{ready{:d}}}\n".format(expected, self.tag).encode('utf-8'))
+        self.proto.dataReceived('{:s}{{ready{:d}}}\n'.format(expected, self.tag).encode('utf-8'))
 
         return d
 

@@ -13,14 +13,14 @@ from twisted.internet import defer, error, protocol
 # https://github.com/smarnach/pyexiftool
 def _fscodec():
     encoding = sys.getfilesystemencoding()
-    errors = "strict"
-    if encoding != "mbcs":
+    errors = 'strict'
+    if encoding != 'mbcs':
         try:
-            codecs.lookup_error("surrogateescape")
+            codecs.lookup_error('surrogateescape')
         except LookupError:
             pass
         else:
-            errors = "surrogateescape"
+            errors = 'surrogateescape'
 
     def fsencode(filename):
         """
@@ -95,7 +95,7 @@ class ExiftoolProtocol(protocol.Protocol):
         self._tag += 1
 
         safe_args = map(fsencode, self.default_args + tuple(args) + ('-execute{:d}'.format(self._tag).encode('utf-8'), b''))
-        self.transport.write(b"\n".join(safe_args))
+        self.transport.write(b'\n'.join(safe_args))
 
         d = defer.Deferred()
         self._queue[self._tag] = d
@@ -109,7 +109,7 @@ class ExiftoolProtocol(protocol.Protocol):
         elif self.connected:
             d = defer.Deferred()
             self._stopped = d
-            self.transport.write(b"\n".join((b'-stay_open', b'False', b'')))
+            self.transport.write(b'\n'.join((b'-stay_open', b'False', b'')))
         else:
             d = defer.fail(RuntimeError("not connected"))
 
