@@ -151,8 +151,9 @@ class ExiftoolProtocol(protocol.Protocol):
         """
         self.connected = 0
 
-        for tag in self._queue.keys():
-            self._queue.pop(tag).errback(reason)
+        for pending in self._queue.values():
+            pending.errback(reason)
+        self._queue.clear()
 
         if self._stopped:
             result = self if reason.check(error.ConnectionDone) else reason
