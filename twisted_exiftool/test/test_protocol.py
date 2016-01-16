@@ -118,6 +118,7 @@ class ExiftoolProtocolTest(TestCase):
 
         return d
 
+    @defer.inlineCallbacks
     def test_disconnect(self):
         self.assertEqual(self.proto.connected, True)
 
@@ -131,9 +132,15 @@ class ExiftoolProtocolTest(TestCase):
         self.assertEqual(self.proto.connected, False)
         self.tr.clear()
 
-        d.addCallback(self.assertEqual, self.proto)
+        result = yield d
+        self.assertEqual(result, self.proto)
 
-        return d
+        # Try to execute a job on the closed protocol.
+        job = self.proto.execute('/path/to/file.jpg')
+        self.assertEqual(self.tr.value(), b'')
+        self.tr.clear()
+
+        yield self.assertFailure(job, error.ConnectionClosed)
 
     def test_connection_lost(self):
         self.assertEqual(self.proto.connected, True)
@@ -143,3 +150,10 @@ class ExiftoolProtocolTest(TestCase):
         self.assertEqual(self.tr.value(), b'')
         self.assertEqual(self.proto.connected, False)
         self.tr.clear()
+
+        # Try to execute a job on the closed protocol.
+        job = self.proto.execute('/path/to/file.jpg')
+        self.assertEqual(self.tr.value(), b'')
+        self.tr.clear()
+
+        return self.assertFailure(job, error.ConnectionClosed)

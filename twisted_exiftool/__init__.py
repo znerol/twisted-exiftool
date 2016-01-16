@@ -104,14 +104,19 @@ class ExiftoolProtocol(protocol.Protocol):
         @return: A deferred whose callback will be invoked when the command
         completed.
         """
-        self._tag += 1
-
-        args = tuple(args) + ('-execute{:d}'.format(self._tag), '')
-        safe_args = [fsencode(arg) for arg in args]
-        self.transport.write(b'\n'.join(safe_args))
 
         result = defer.Deferred()
-        self._queue[self._tag] = result
+        if self.connected and not self._stopped:
+            self._tag += 1
+
+            args = tuple(args) + ('-execute{:d}'.format(self._tag), '')
+            safe_args = [fsencode(arg) for arg in args]
+            self.transport.write(b'\n'.join(safe_args))
+
+            result = defer.Deferred()
+            self._queue[self._tag] = result
+        else:
+            result.errback(error.ConnectionClosed('Not connected to exiftool'))
 
         return result
 
@@ -145,6 +150,10 @@ class ExiftoolProtocol(protocol.Protocol):
         @type reason: L{twisted.python.failure.Failure}
         """
         self.connected = 0
+
+        for tag in self._queue.keys():
+            self._queue.pop(tag).errback(reason)
+
         if self._stopped:
             result = self if reason.check(error.ConnectionDone) else reason
             self._stopped.callback(result)
