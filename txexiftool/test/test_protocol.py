@@ -1,5 +1,5 @@
 """
-Tests for L{twisted_exiftool.ExiftoolProtocol}
+Tests for L{txexiftool.ExiftoolProtocol}
 """
 from __future__ import absolute_import
 from __future__ import division
@@ -9,7 +9,7 @@ from twisted.internet import defer, error, protocol
 from twisted.python import failure
 from twisted.test import proto_helpers
 from twisted.trial.unittest import TestCase
-from twisted_exiftool import ExiftoolProtocol
+from txexiftool import ExiftoolProtocol
 
 
 class ExiftoolProtocolTest(TestCase):

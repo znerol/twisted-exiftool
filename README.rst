@@ -1,8 +1,8 @@
-Twisted Exiftool
-================
+txExiftool
+==========
 
-.. image:: https://travis-ci.org/znerol/twisted-exiftool.svg?branch=master
-    :target: https://travis-ci.org/znerol/twisted-exiftool
+.. image:: https://travis-ci.org/znerol/txexiftool.svg?branch=master
+    :target: https://travis-ci.org/znerol/txexiftool
 
 
 Exiftool_ protocol and stream endpoint plugin to be used with twisted_.
@@ -17,7 +17,7 @@ Usage
 ::
 
     from twisted.internet import defer, endpoints, protocol, reactor
-    from twisted_exiftool import ExiftoolProtocol
+    from txexiftool import ExiftoolProtocol
 
     @defer.inlineCallbacks
     def test():

@@ -8,11 +8,11 @@ from twisted.trial import unittest
 
 class ClientStringTests(unittest.TestCase):
     """
-    Tests for L{twisted.plugins.twisted_exiftool.ExiftoolProcessEndpoint}.
+    Tests for L{twisted.plugins.txexiftool.ExiftoolProcessEndpoint}.
     """
 
     def setUp(self):
-        from twisted.plugins.twisted_exiftool import ExiftoolProcessEndpoint
+        from twisted.plugins.txexiftool import ExiftoolProcessEndpoint
         ExiftoolProcessEndpoint._which = self.which_stub
 
 

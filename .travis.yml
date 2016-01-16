@@ -6,4 +6,4 @@ install:
   - python bootstrap.py
   - bin/buildout
 script:
-  - bin/trial twisted_exiftool
+  - bin/trial txexiftool

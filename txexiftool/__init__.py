@@ -11,7 +11,7 @@ from twisted.internet import defer, error, protocol
 try:
     from os import fsencode
 except ImportError:
-    from twisted_exiftool.compat import fsencode
+    from txexiftool.compat import fsencode
 
 
 class ExiftoolProtocol(protocol.Protocol):
