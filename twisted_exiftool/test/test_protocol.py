@@ -142,7 +142,14 @@ class ExiftoolProtocolTest(TestCase):
 
         yield self.assertFailure(job, error.ConnectionClosed)
 
+    @defer.inlineCallbacks
     def test_connection_lost(self):
+        self.tag += 1
+
+        pending_job = self.proto.execute('/path/to/file.jpg')
+        self.assertEqual(self.tr.value(), '/path/to/file.jpg\n-execute{:d}\n'.format(self.tag).encode('utf-8'))
+        self.tr.clear()
+
         self.assertEqual(self.proto.connected, True)
 
         self.failUnlessRaises(error.ConnectionLost, self.proto.connectionLost, failure.Failure(error.ConnectionLost('process exited')))
@@ -151,9 +158,13 @@ class ExiftoolProtocolTest(TestCase):
         self.assertEqual(self.proto.connected, False)
         self.tr.clear()
 
+        # Ensure that the errback is triggered on a pending job when the
+        # connection to exiftool was lost.
+        yield self.assertFailure(pending_job, error.ConnectionLost)
+
         # Try to execute a job on the closed protocol.
         job = self.proto.execute('/path/to/file.jpg')
         self.assertEqual(self.tr.value(), b'')
         self.tr.clear()
 
-        return self.assertFailure(job, error.ConnectionClosed)
+        yield self.assertFailure(job, error.ConnectionClosed)
